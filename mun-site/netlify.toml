@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = ".next"           # Next.js output (Netlify Next runtime picks it up)
+  # Optional but recommended:
+  environment = { NODE_VERSION = "20", NEXT_TELEMETRY_DISABLED = "1" }
+
+# Use Netlify's official Next.js runtime (SSR, image optimization, middleware)
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
