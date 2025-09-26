@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 
-// Supabase client with local session persistence
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -31,13 +30,12 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  // shared styles
   const btn =
     "inline-flex items-center justify-center px-5 py-2.5 rounded-md border border-zinc-300 bg-white text-zinc-800 font-semibold transition-all duration-300 ease-out shadow-sm hover:shadow-lg hover:border-zinc-400 hover:bg-zinc-50 hover:-translate-y-[2px] active:translate-y-0";
   const input =
     "w-full px-3 py-2 rounded-md border border-zinc-300 bg-white text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500";
 
-  async function handleSignup(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMsg("");
 
@@ -50,7 +48,6 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // 1) Create auth user
       const { error: signErr } = await supabase.auth.signUp({
         email,
         password,
@@ -62,26 +59,17 @@ export default function SignupPage() {
         return;
       }
 
-      // 2) Log in (if email confirmation is OFF, this will succeed immediately)
-      const { error: loginErr } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
       if (loginErr && !/email not confirmed/i.test(loginErr.message)) {
         setMsg("❌ " + loginErr.message);
         setLoading(false);
         return;
       }
 
-      // 3) Upsert profile with default role "delegate"
       const { error: upsertErr } = await supabase
         .from("users")
         .upsert(
-          {
-            email,
-            full_name: fullName.trim(),
-            role: "delegate",
-          },
+          { email, full_name: fullName.trim(), role: "delegate" },
           { onConflict: "email" }
         );
       if (upsertErr) {
@@ -90,7 +78,6 @@ export default function SignupPage() {
         return;
       }
 
-      // 4) If confirmation is ON, session may not exist yet
       const { data: sessData } = await supabase.auth.getSession();
       if (!sessData?.session) {
         setMsg("✅ Account created. Please verify your email before logging in.");
@@ -98,12 +85,10 @@ export default function SignupPage() {
         return;
       }
 
-      // 5) Success → go home
       router.replace("/home");
     } catch (err: unknown) {
-      let message = "Something went wrong";
-      if (err instanceof Error) message = err.message;
-      else if (typeof err === "string") message = err;
+      const message =
+        err instanceof Error ? err.message : typeof err === "string" ? err : "Something went wrong";
       setMsg("❌ " + message);
       setLoading(false);
     }
@@ -118,7 +103,6 @@ export default function SignupPage() {
         </p>
 
         <form onSubmit={handleSignup} className="mt-8 space-y-5">
-          {/* Full Name */}
           <div>
             <label className="block text-sm text-zinc-700 mb-1">Full name</label>
             <input
@@ -130,7 +114,6 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-sm text-zinc-700 mb-1">Email</label>
             <input
@@ -143,7 +126,6 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-sm text-zinc-700 mb-1">Password</label>
             <div className="relative">
@@ -166,7 +148,6 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Conference Passcode */}
           <div>
             <label className="block text-sm text-zinc-700 mb-1">Conference passcode</label>
             <input
@@ -179,7 +160,6 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* Submit */}
           <div className="pt-2 flex items-center justify-between">
             <button type="submit" disabled={loading} className={btn}>
               {loading ? "Creating…" : "Sign Up"}
@@ -189,13 +169,8 @@ export default function SignupPage() {
             </Link>
           </div>
 
-          {/* Status */}
           {msg && (
-            <p
-              className={`text-sm mt-2 ${
-                msg.startsWith("✅") ? "text-green-600" : "text-red-600"
-              }`}
-            >
+            <p className={`text-sm mt-2 ${msg.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>
               {msg}
             </p>
           )}

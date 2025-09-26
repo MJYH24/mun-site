@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -88,41 +89,29 @@ export default function PublicProfile() {
       <section className="rounded-lg border border-zinc-200 p-5 bg-zinc-50">
         <h2 className="text-lg font-semibold text-zinc-900 mb-2">About</h2>
         <p className="text-zinc-700 whitespace-pre-line min-h-[40px]">
-          {profile.bio && profile.bio.trim() !== ""
-            ? profile.bio
-            : "No biography provided yet."}
+          {profile.bio && profile.bio.trim() !== "" ? profile.bio : "No biography provided yet."}
         </p>
       </section>
 
-      {/* This Year&apos;s Assignment (apostrophe escaped) */}
+      {/* This Year&apos;s Assignment */}
       <section className="rounded-lg border border-zinc-200 p-5 bg-zinc-50">
-        <h2 className="text-lg font-semibold text-zinc-900 mb-2">
-          This Year&apos;s Assignment
-        </h2>
+        <h2 className="text-lg font-semibold text-zinc-900 mb-2">This Year&apos;s Assignment</h2>
         <p className="text-zinc-700">
           <span className="font-medium">Country:</span>{" "}
-          {profile.country && profile.country.trim() !== ""
-            ? profile.country
-            : "— (Not assigned yet)"}
+          {profile.country && profile.country.trim() !== "" ? profile.country : "— (Not assigned yet)"}
         </p>
         <p className="text-zinc-700 mt-1">
           <span className="font-medium">Committee:</span>{" "}
-          {profile.committee && profile.committee.trim() !== ""
-            ? profile.committee
-            : "— (Not assigned yet)"}
+          {profile.committee && profile.committee.trim() !== "" ? profile.committee : "— (Not assigned yet)"}
         </p>
       </section>
 
       {/* Past Conferences */}
       <section className="rounded-lg border border-zinc-200 p-5 bg-zinc-50">
-        <h2 className="text-lg font-semibold text-zinc-900 mb-2">
-          Past Conferences
-        </h2>
+        <h2 className="text-lg font-semibold text-zinc-900 mb-2">Past Conferences</h2>
         <p className="text-zinc-700">
           {profile.past_conferences && profile.past_conferences > 0
-            ? `${profile.past_conferences} conference${
-                profile.past_conferences > 1 ? "s" : ""
-              } attended`
+            ? `${profile.past_conferences} conference${profile.past_conferences > 1 ? "s" : ""} attended`
             : "— (No conferences recorded yet)"}
         </p>
       </section>
@@ -131,9 +120,7 @@ export default function PublicProfile() {
       <section className="rounded-lg border border-zinc-200 p-5 bg-zinc-50">
         <h2 className="text-lg font-semibold text-zinc-900 mb-2">Awards</h2>
         <p className="text-zinc-700 min-h-[30px]">
-          {profile.awards && profile.awards.trim() !== ""
-            ? profile.awards
-            : "— (No awards listed yet)"}
+          {profile.awards && profile.awards.trim() !== "" ? profile.awards : "— (No awards listed yet)"}
         </p>
       </section>
     </main>
