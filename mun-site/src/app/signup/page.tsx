@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 
-// ✅ Create Supabase client with session persistence
+// Supabase client with local session persistence
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -31,7 +31,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  // ✅ Reusable styles
+  // shared styles
   const btn =
     "inline-flex items-center justify-center px-5 py-2.5 rounded-md border border-zinc-300 bg-white text-zinc-800 font-semibold transition-all duration-300 ease-out shadow-sm hover:shadow-lg hover:border-zinc-400 hover:bg-zinc-50 hover:-translate-y-[2px] active:translate-y-0";
   const input =
@@ -44,51 +44,53 @@ export default function SignupPage() {
     if (!fullName.trim()) return setMsg("❌ Full name is required");
     if (!email.trim()) return setMsg("❌ Email is required");
     if (password.length < 6) return setMsg("❌ Password must be at least 6 characters");
-    if (passcode !== process.env.NEXT_PUBLIC_CONF_PASSCODE) return setMsg("❌ Invalid conference passcode");
+    if (passcode !== process.env.NEXT_PUBLIC_CONF_PASSCODE)
+      return setMsg("❌ Invalid conference passcode");
 
     setLoading(true);
 
     try {
-      // ✅ 1. Create user
+      // 1) Create auth user
       const { error: signErr } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: window.location.origin + "/auth/callback" },
       });
-
       if (signErr && !/already\s*registered/i.test(signErr.message)) {
         setMsg("❌ " + signErr.message);
         setLoading(false);
         return;
       }
 
-      // ✅ 2. Log in immediately (if confirmation disabled)
-      const { error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
+      // 2) Log in (if email confirmation is OFF, this will succeed immediately)
+      const { error: loginErr } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (loginErr && !/email not confirmed/i.test(loginErr.message)) {
         setMsg("❌ " + loginErr.message);
         setLoading(false);
         return;
       }
 
-      // ✅ 3. Upsert profile with default role delegate
+      // 3) Upsert profile with default role "delegate"
       const { error: upsertErr } = await supabase
         .from("users")
         .upsert(
           {
             email,
             full_name: fullName.trim(),
-            role: "delegate", // 👈 default delegate always set
+            role: "delegate",
           },
           { onConflict: "email" }
         );
-
       if (upsertErr) {
         setMsg("❌ " + upsertErr.message);
         setLoading(false);
         return;
       }
 
-      // ✅ 4. Check if session exists (if email confirm is ON)
+      // 4) If confirmation is ON, session may not exist yet
       const { data: sessData } = await supabase.auth.getSession();
       if (!sessData?.session) {
         setMsg("✅ Account created. Please verify your email before logging in.");
@@ -96,10 +98,13 @@ export default function SignupPage() {
         return;
       }
 
-      // ✅ 5. Redirect to home
+      // 5) Success → go home
       router.replace("/home");
-    } catch (err: any) {
-      setMsg("❌ " + (err?.message || "Something went wrong"));
+    } catch (err: unknown) {
+      let message = "Something went wrong";
+      if (err instanceof Error) message = err.message;
+      else if (typeof err === "string") message = err;
+      setMsg("❌ " + message);
       setLoading(false);
     }
   }
@@ -108,7 +113,9 @@ export default function SignupPage() {
     <main className="max-w-lg mx-auto px-6 py-16">
       <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
         <h1 className="text-2xl font-bold text-zinc-900 text-center">Create your account</h1>
-        <p className="text-center text-zinc-600 mt-1">Join <span className="font-medium">MUN On The Rhine</span></p>
+        <p className="text-center text-zinc-600 mt-1">
+          Join <span className="font-medium">MUN On The Rhine</span>
+        </p>
 
         <form onSubmit={handleSignup} className="mt-8 space-y-5">
           {/* Full Name */}
@@ -172,7 +179,7 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <div className="pt-2 flex items-center justify-between">
             <button type="submit" disabled={loading} className={btn}>
               {loading ? "Creating…" : "Sign Up"}
@@ -182,7 +189,7 @@ export default function SignupPage() {
             </Link>
           </div>
 
-          {/* Status Message */}
+          {/* Status */}
           {msg && (
             <p
               className={`text-sm mt-2 ${

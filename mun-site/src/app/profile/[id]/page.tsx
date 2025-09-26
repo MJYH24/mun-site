@@ -94,10 +94,10 @@ export default function PublicProfile() {
         </p>
       </section>
 
-      {/* This Year's Assignment (Placeholder Section) */}
+      {/* This Year&apos;s Assignment (apostrophe escaped) */}
       <section className="rounded-lg border border-zinc-200 p-5 bg-zinc-50">
         <h2 className="text-lg font-semibold text-zinc-900 mb-2">
-          This Year's Assignment
+          This Year&apos;s Assignment
         </h2>
         <p className="text-zinc-700">
           <span className="font-medium">Country:</span>{" "}
