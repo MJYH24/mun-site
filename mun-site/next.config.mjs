@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    // ✅ Allow build to continue even if there are ESLint errors
+    // Don’t fail production build on ESLint problems
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // ✅ Allow build to continue even if there are TypeScript errors
+    // Don’t fail production build on type errors
     ignoreBuildErrors: true,
   },
 };
