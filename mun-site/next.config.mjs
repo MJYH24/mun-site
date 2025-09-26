@@ -1,13 +1,13 @@
+import path from "path";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    // Don’t fail production build on ESLint problems
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    // Don’t fail production build on type errors
-    ignoreBuildErrors: true,
-  },
+  // If there’s a lockfile/package.json in the parent directory, set the tracing root:
+  outputFileTracingRoot: path.resolve(__dirname, ".."),
+
+  // Keep deploys unblocked while you iterate:
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true }
 };
 
 export default nextConfig;
